@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+.bg-sunny {
+    background: linear-gradient(to right, #3c3b3f, #605c3c); /* Dark golden-brown glow */
+}
+
+.bg-cloudy {
+    background: linear-gradient(to right, #2e2e2e, #505050); /* Cool dark gray for overcast */
+}
+
+.bg-rainy {
+    background: linear-gradient(to right, #2c3e50, #4ca1af); /* Deep bluish with misty tones */
+}
+
+.bg-snowy {
+    background: linear-gradient(to right, #434343, #636363); /* Icy grays with good contrast */
+}
+
+.bg-thunder {
+    background: linear-gradient(to right, #1c1c1c, #383838); /* Stormy dark steel tone */
+}
+
+.bg-default {
+    background: linear-gradient(to right, #141e30, #243b55); /* Calm night sky default */
+}
+
+
