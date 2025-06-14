@@ -1,5 +1,5 @@
 import React, {useRef} from "react";
-import sunny from '../assets/images/sun.png';
+import cloudyandrain  from "/public/cloudyandrain.png"
 import "./HourlyWeather.css";
 import {FaChevronLeft, FaChevronRight} from "react-icons/fa";
 
@@ -30,7 +30,7 @@ function HourlyWeather({hourlyData}){
                 {hourlyData.map((hour, index) => (
                     <div key={index} className="flex flex-col items-center bg-white/10 rounded p-4 min-w-[140px]">
                         <p className="text-sm">{hour.time.split(' ')[1]}</p>
-                        <img src={hour.condition.icon || sunny} alt="weather icon" className="w-10 h-10" />
+                        <img src={hour.condition.icon || cloudyandrain} alt="weather icon" className="w-10 h-10" />
                         <p className="text-sm">{hour.temp_c}°C</p>
                         <div className="text-left w-full ml-3">
 
