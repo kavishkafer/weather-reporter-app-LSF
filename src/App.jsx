@@ -90,7 +90,7 @@ function App() {
                             onKeyUp={handleKeyPress}
                         />
                         <button
-                            onClick={fetchWeatherData}
+                            onClick={() => fetchWeatherData(city)}
                             className="px-2 text-white-600 hover:text-gray-400"
                             title="Search"
                         >
