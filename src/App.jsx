@@ -1,18 +1,13 @@
-// import './App.css'
-// import './index.css'
-import { getWeatherBackground } from "./utils/utils.js";
 
+import { getWeatherBackground } from "./utils/utils.js";
+import { getWeatherByCity, getWeatherByCoordinates } from "./services/weatherService";
 import {FaMapMarker, FaSearch, FaTemperatureLow} from "react-icons/fa";
 import HourlyWeather from "./components/HourlyWeather.jsx";
-import axios from 'axios';
 import {useEffect, useState} from "react";
 import {BsSun} from "react-icons/bs";
 import {WiHumidity, WiStrongWind} from "react-icons/wi";
 
 function App() {
-    const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-    const WEATHER_API_URL = import.meta.env.VITE_WEATHER_API_URL;
-    // Function to fetch weather data
 
     const [weatherData, setWeatherData] = useState(null);
     const [city, setCity] = useState("Colombo"); // Default city
@@ -22,24 +17,19 @@ function App() {
     useEffect(() => {
         fetchWeatherData(); // fetch on initial load
     }, []);
-    const fetchWeatherData = async (customCity=city) => {
+    const fetchWeatherData = async (customCity = city) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${WEATHER_API_URL}?key=${WEATHER_API_KEY}&q=${city}&days=1`);
-            if (response.data.error) {
-                setError(response.data.error.message);
+            const data = await getWeatherByCity(customCity);
+            if (data.error) {
+                setError(data.error.message);
                 setWeatherData(null);
-                return;
-            }
-            setWeatherData(response.data);
-            setError(""); // Clear any previous error
-
-        } catch (error) {
-            if (error.response?.data?.error?.message) {
-                setError(error.response.data.error.message);
             } else {
-                setError("Failed to fetch weather data. Please try again.");
+                setWeatherData(data);
+                setError("");
             }
+        } catch (error) {
+            setError("Failed to fetch weather data. Please try again.");
             setWeatherData(null);
         } finally {
             setLoading(false);
@@ -48,24 +38,32 @@ function App() {
     // Function to get current location weather
     const getCurrentLocation = () => {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const {latitude, longitude} = position.coords;
-                try {
-                    const response = await axios.get(`${WEATHER_API_URL}?key=${WEATHER_API_KEY}&q=${latitude},${longitude}&days=1`);
-                    setWeatherData(response.data);
-                    setCity(response.data.location.name); // Update city to current location
-                    setError(""); // Clear any previous error
-                } catch (error) {
-                    console.error("Error fetching weather data for current location:", error);
-                    setError("Failed to fetch weather data for current location. Please try again.");
+            setLoading(true);
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    try {
+                        const data = await getWeatherByCoordinates(latitude, longitude);
+                        setWeatherData(data);
+                        setCity(data.location.name);
+                        setError("");
+                    } catch (error) {
+                        setError("Failed to fetch weather data for current location.");
+                        setWeatherData(null);
+                    } finally {
+                        setLoading(false);
+                    }
+                },
+                () => {
+                    setError("Unable to retrieve your location. Please allow location access.");
+                    setLoading(false);
                 }
-            }, () => {
-                setError("Unable to retrieve your location. Please allow location access.");
-            });
+            );
         } else {
             setError("Geolocation is not supported by this browser.");
         }
-    }
+    };
+
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
             fetchWeatherData(); // Trigger search on Enter key press
@@ -118,7 +116,7 @@ function App() {
                     </div>
                 ) : weatherData && (
                     <div className="mt-4 text-center">
-                        <h2 className="text-xl font-semibold">{weatherData.location.name}</h2>
+                        <h2 className="text-xl font-semibold">{weatherData.location.name}, {weatherData.location.country}</h2>
                         <img src={weatherData.current.condition.icon} alt="weather icon" className="mx-auto my-2 w-30 h-30" />
                         <p className="text-lg font-semibold">{weatherData.current.temp_c}°C</p>
                         <p className="text-sm capitalize font-semibold">{weatherData.current.condition.text}</p>
