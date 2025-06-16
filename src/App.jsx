@@ -21,15 +21,27 @@ function App() {
         setLoading(true);
         try {
             const data = await getWeatherByCity(customCity);
+
             if (data.error) {
-                setError(data.error.message);
+                //  return an error for  invalid city name
+                if (data.error.code === 1006) {
+                    setError("City not found. Please check the city name.");
+                } else {
+                    setError(data.error.message || "An error occurred while fetching data.");
+                }
                 setWeatherData(null);
             } else {
                 setWeatherData(data);
                 setError("");
             }
+
         } catch (error) {
-            setError("Failed to fetch weather data. Please try again.");
+            // Network or unexpected error
+            if (error.message.includes("NetworkError") || error.message.includes("Failed to fetch")) {
+                setError("Network error. Please check your internet connection.");
+            } else {
+                setError("Server error. Please try again later.");
+            }
             setWeatherData(null);
         } finally {
             setLoading(false);
@@ -48,7 +60,7 @@ function App() {
                         setCity(data.location.name);
                         setError("");
                     } catch (error) {
-                        setError("Failed to fetch weather data for current location.");
+                        setError("Failed to fetch weather data for  current location.");
                         setWeatherData(null);
                     } finally {
                         setLoading(false);
